@@ -26,19 +26,19 @@ void print_buffer(char *b, int size)
 		for (i = 0; i < 10; i++)
 		{
 			if (i < j)
-				printf("%02x", *(b + o + i));
+				printf("%02x", (unsigned char)*(b + o + i));
 			else
 				printf(" ");
-			if (i % 2)
+			if (i % 2 == 1)
 			{
 				printf(" ");
 			}
 		}
 		for (i = 0; i < j; i++)
 		{
-			int c = *(b + o + i);
+			unsigned char  c = *(b + o + i);
 
-			if (c < 32 || c > 132)
+			if (c < 32 || c > 126)
 			{
 				c = '.';
 			}
