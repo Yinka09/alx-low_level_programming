@@ -11,7 +11,7 @@
 
 list_t *add_node(list_t **head, const char *str)
 {
-	int len;
+	int i;
 	char *str2;
 	list_t *current;
 
@@ -28,12 +28,12 @@ list_t *add_node(list_t **head, const char *str)
 		return (NULL);
 	}
 
-	for (len = 0; str[len] != '\0';)
+	for (i = 0; str[i] != '\0';)
 
-		len++;
+		i++;
 
 	current->str = str2;
-	current->len = len;
+	current->len = i;
 	current->next = *head;
 
 
