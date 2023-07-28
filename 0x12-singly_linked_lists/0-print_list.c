@@ -13,9 +13,7 @@ size_t print_list(const list_t *h)
 {
 	size_t count = 0;
 
-	const list_t *move = NULL;
-
-	move = h;
+	const list_t *move = h;
 
 	while (move != NULL)
 	{
@@ -24,7 +22,7 @@ size_t print_list(const list_t *h)
 		else
 			printf("[0] (nil)\n");
 
-		count++;
+		count += 1;
 		move = move->next;
 	}
 	return (count);
