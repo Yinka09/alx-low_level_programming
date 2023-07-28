@@ -1,0 +1,166 @@
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdint.h>
+
+void unsigned_number_to_string(uint64_t number, int base, char *buffer){
+  if (number == 0){
+    *buffer++ = '0';
+    *buffer = 0;
+    return;
+  }
+  char buf[65];
+  for (int i = 0; i < 65; i++)
+    buf[i] = 0;
+
+  int cur = 0;
+
+  while (number){
+    int digit = number % base;
+    if (digit >= 10){
+      buf[cur++] = 'a' + (digit - 10);
+    } else {
+      buf[cur++] = '0' + digit;
+    }
+    number /= base; 
+  }
+  for (int i = cur - 1; i != 0; i--)
+    *buffer++ = buf[i];
+  *buffer++ = buf[0];
+  *buffer = 0;
+}
+
+void number_to_string(int64_t number, int base,  char *buffer){
+  if (number < 0){
+    *buffer++ = '-';
+    number = -number;
+  }
+unsigned_number_to_string(number, base, buffer);
+}
+
+// State:
+// 0: regular
+// 1: escape
+  
+
+int _printf(const char *format, ...)
+{
+  
+  va_list args;
+  va_start(args, format);
+  int state = 0;
+  char ch;
+  int count = 0;
+
+  while (*format)
+    {
+      if (state == 0){
+        if (*format == '%'){
+          state = 1;
+        }
+        else {
+          putchar(*format);
+          count++;
+      }
+    } else if (state == 1){
+        switch (*format){
+            case 'c':{
+             char ch = va_arg(args, int);
+              putchar(ch);
+              count++;
+              break;
+	     }
+            case 's':{
+              const char *s = va_arg(args, const char *);
+              while (*s != '\0'){
+                putchar(*s++);
+                count++;
+              }
+              break;
+            }
+          case 'i':
+            case 'd':{
+              int n = va_arg(args, int);
+              char buf[32];
+              number_to_string(n, 10, buf);
+              for (int i = 0; buf[i]; i++){
+                putchar(buf[i]);
+                count++;
+              }
+              break;
+              }
+            case 'b':{
+              int n = va_arg(args, int);
+              char buf[32];
+              number_to_string(n, 2, buf);
+              for (int i = 0; buf[i]; i++){
+                putchar(buf[i]);
+                count++;
+              }
+              break;
+              }
+            case 'x':{
+              int n = va_arg(args, int);
+              char buf[32];
+              number_to_string(n, 16, buf);
+              for (int i = 0; buf[i]; i++){
+                putchar(buf[i]);
+                count++;
+              }
+              break;
+              }
+            case 'p':{
+              putchar('0');
+              putchar('x');
+
+              void *n = va_arg(args, void *);
+              
+              char buf [32];
+              unsigned_number_to_string((uint64_t) n, 16, buf);
+              for (int i = 0; buf[i]; i++){
+                putchar(buf[i]);
+              }
+              
+              break;
+            }
+            case '%':
+                    putchar('%');
+                    count++;
+                    break;
+                default:
+                    // Ignore unsupported format specifiers
+                    break;
+          }
+          state = 0;
+    }
+      format++;
+  }
+  
+  va_end(args);
+  return count;
+}
+
+int main()
+{
+  void *pointer_to_main = (void *) main;
+
+ int len = _printf("Let's try to printf a simple sentence.\n");
+  int len2 = printf("Let's try to printf a simple sentence.\n");
+  
+    len = _printf("Percent:[%%]\n");
+    len2 = printf("Percent:[%%]\n");
+    _printf("Len:[%d]\n", len);
+    printf("Len:[%d]\n", len2);
+  _printf("Print a character: %c. Done!\n", 'H');
+  _printf("Print a string: %s. Done!\n", "Hello world");
+  _printf("Print an integer: %d. Done!\n", 10);
+  _printf("Print a neg integer: %d. Done!\n", -10);
+  _printf("Print a zero integer: %d. Done!\n", 0);
+  _printf("Print an hex integer: %x. Done!\n", 10);
+  _printf("Print a zero hex integer: %x. Done!\n", 0);
+  _printf("Print a pointer: %p. Done!\n", pointer_to_main);
+ _printf("Length:[%d, %i]\n", len, len);
+ printf("Length:[%d, %i]\n", len2, len2);
+  printf("Print a pointer: %p. Done!\n", pointer_to_main);
+  _printf("%b\n", 98);
+  return (0);
+}
